@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Market for You</title>
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        /* ===== PALETA ===== */
+        :root {
+            --bg-primary: #0d0b1a;
+            --bg-card: #1a1630;
+            --bg-input: #2a2444;
+            --orange: #ff6b35;
+            --orange-hover: #ff8a5c;
+            --purple: #9b59ff;
+            --purple-glow: rgba(155, 89, 255, 0.3);
+            --text-primary: #f0ecff;
+            --text-muted: #b8b0d6;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* ===== TELA DE LOGIN ===== */
+        #loginScreen {
+            width: 100%;
+            max-width: 400px;
+            background: var(--bg-card);
+            border-radius: 32px;
+            padding: 40px 28px;
+            box-shadow: 0 20px 60px rgba(155, 89, 255, 0.15);
+            border: 1px solid rgba(155, 89, 255, 0.1);
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        #loginScreen h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--orange), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        #loginScreen p {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-size: 0.95rem;
+        }
+
+        .social-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-bottom: 14px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid transparent;
+        }
+
+        .social-btn i {
+            font-size: 1.4rem;
+        }
+
+        .social-btn.google:hover {
+            background: #2a1f3d;
+            border-color: #ea4335;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(234, 67, 53, 0.2);
+        }
+
+        .social-btn.facebook:hover {
+            background: #2a1f3d;
+            border-color: #1877f2;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(24, 119, 242, 0.2);
+        }
+
+        .social-btn .fa-google { color: #ea4335; }
+        .social-btn .fa-facebook { color: #1877f2; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--purple), transparent);
+        }
+
+        /* ===== APP (escondido inicialmente) ===== */
+        #appScreen {
+            display: none;
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            max-height: 900px;
+            background: var(--bg-primary);
+            border-radius: 36px;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(155, 89, 255, 0.08);
+            position: relative;
+            flex-direction: column;
+        }
+
+        /* Área de conteúdo principal */
+        #mainContent {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 20px 100px;
+        }
+
+        /* Header do app */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px 0;
+        }
+        .app-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--orange), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .app-header .badge {
+            background: var(--bg-card);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border: 1px solid rgba(155, 89, 255, 0.2);
+        }
+
+        /* Cartão de boas-vindas */
+        .welcome-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 20px;
+            border-left: 4px solid var(--orange);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .welcome-card h3 {
+            font-size: 1.2rem;
+        }
+        .welcome-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        /* ===== MENU INFERIOR ===== */
+        #bottomNav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(155, 89, 255, 0.15);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 16px;
+            border-radius: 0 0 36px 36px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 4px 16px;
+            position: relative;
+        }
+        .nav-item i {
+            font-size: 1.6rem;
+            transition: all 0.2s ease;
+        }
+        .nav-item span {
+            font-weight: 500;
+        }
+
+        .nav-item.active {
+            color: var(--orange);
+        }
+        .nav-item.active i {
+            text-shadow: 0 0 20px var(--purple-glow);
+            transform: translateY(-2px);
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--orange), var(--purple));
+            border-radius: 0 0 6px 6px;
+            transition: width 0.3s ease;
+        }
+        .nav-item.active::after {
+            width: 40px;
+        }
+
+        /* ===== PÁGINAS (conteúdo dinâmico) ===== */
+        .page {
+            display: none;
+            animation: fadeUp 0.35s ease;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards de exemplo */
+        .market-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 18px;
+            margin-top: 16px;
+            border: 1px solid rgba(155, 89, 255, 0.08);
+            transition: 0.2s;
+        }
+        .market-card h4 {
+            color: var(--orange);
+        }
+        .market-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Tooltip para mobile */
+        .coming-soon {
+            background: var(--bg-input);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+
+        /* ===== RESPONSIVO ===== */
+        @media (max-width: 480px) {
+            #loginScreen { padding: 30px 20px; }
+            #appScreen { border-radius: 0; max-height: 100vh; height: 100vh; }
+            #bottomNav { border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== TELA DE LOGIN ==================== -->
+    <div id="loginScreen">
+        <h1>🛒 Market for You</h1>
+        <p>Entre com sua conta para começar</p>
+
+        <button class="social-btn google" onclick="loginWith('Google')">
+            <i class="fab fa-google"></i> Continuar com Google
+        </button>
+        <button class="social-btn facebook" onclick="loginWith('Facebook')">
+            <i class="fab fa-facebook"></i> Continuar com Facebook
+        </button>
+
+        <div class="divider">ou</div>
+
+        <button class="social-btn" style="background:transparent; border:1px solid var(--purple);" onclick="loginWith('demo')">
+            <i class="fas fa-rocket" style="color:var(--orange);"></i> Entrar como convidado
+        </button>
+    </div>
+
+    <!-- ==================== APP (logado) ==================== -->
+    <div id="appScreen">
+        <!-- Header -->
+        <div class="app-header">
+            <h2>Market for You</h2>
+            <span class="badge"><i class="fas fa-map-pin"></i> Próximo</span>
+        </div>
+
+        <!-- Conteúdo principal -->
+        <div id="mainContent">
+            <!-- PÁGINA HOME -->
+            <div id="pageHome" class="page active">
+                <div class="welcome-card">
+                    <h3>👋 Olá, <span id="userName">Usuário</span>!</h3>
+                    <p>Mercados e farmácias perto de você.</p>
+                </div>
+
+                <div class="market-card">
+                    <h4><i class="fas fa-store" style="color:var(--purple);"></i> Super Fácil</h4>
+                    <p>📍 1.2 km • Aberto até 22h</p>
+                    <p style="font-size:0.8rem; margin-top:6px;">Fraldas, leite, medicamentos...</p>
+                </div>
+                <div class="market-card">
+                    <h4><i class="fas fa-prescription-bottle" style="color:var(--orange);"></i> Farmácia Popular</h4>
+                    <p>📍 800 m • 24h</p>
+                    <p style="font-size:0.8rem; margin-top:6px;">Remédios, testes, higiene...</p>
+                </div>
+            </div>
+
+            <!-- PÁGINA PESQUISAR -->
+            <div id="pageSearch" class="page">
+                <div class="welcome-card" style="border-left-color:var(--purple);">
+                    <h3>🔍 Encontrar mercados</h3>
+                    <p>Digite o nome ou filtro por categoria.</p>
+                </div>
+                <div class="coming-soon">
+                    <i class="fas fa-search" style="font-size:2rem; color:var(--purple);"></i>
+                    <p style="margin-top:10px;">Campo de busca + filtros em breve</p>
+                </div>
+            </div>
+
+            <!-- PÁGINA FERRAMENTAS (registrar empresa) -->
+            <div id="pageTools" class="page">
+                <div class="welcome-card" style="border-left-color:var(--orange);">
+                    <h3>🏢 Registrar sua empresa</h3>
+                    <p>Preencha os dados para aparecer no app.</p>
+                </div>
+                <div class="coming-soon">
+                    <i class="fas fa-building" style="font-size:2rem; color:var(--orange);"></i>
+                    <p style="margin-top:10px;">Formulário: razão social, biografia, catálogo...</p>
+                </div>
+            </div>
+
+            <!-- PÁGINA PERFIL -->
+            <div id="pageProfile" class="page">
+                <div class="welcome-card" style="border-left-color:var(--purple);">
+                    <h3>👤 Meu perfil</h3>
+                    <p><strong id="profileName">Usuário</strong></p>
+                    <p style="font-size:0.85rem; margin-top:6px;">
+                        <i class="fas fa-map-marker-alt" style="color:var(--orange);"></i> Endereços<br>
+                        <i class="fas fa-briefcase" style="color:var(--purple);"></i> Profissão: não definido
+                    </p>
+                </div>
+                <div class="coming-soon">
+                    <i class="fas fa-cog" style="font-size:2rem; color:var(--text-muted);"></i>
+                    <p style="margin-top:10px;">Configurações, apelidos e mais</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MENU INFERIOR ===== -->
+        <div id="bottomNav">
+            <button class="nav-item active" data-page="pageHome">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" data-page="pageSearch">
+                <i class="fas fa-search"></i>
+                <span>Pesquisar</span>
+            </button>
+            <button class="nav-item" data-page="pageTools">
+                <i class="fas fa-tools"></i>
+                <span>Ferramentas</span>
+            </button>
+            <button class="nav-item" data-page="pageProfile">
+                <i class="fas fa-user"></i>
+                <span>Perfil</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ===== SIMULA LOGIN =====
+        function loginWith(method) {
+            const loginScreen = document.getElementById('loginScreen');
+            const appScreen = document.getElementById('appScreen');
+            const userName = document.getElementById('userName');
+            const profileName = document.getElementById('profileName');
+
+            let name = 'Usuário';
+            if (method === 'Google') name = 'Ana (Google)';
+            else if (method === 'Facebook') name = 'Carlos (FB)';
+            else if (method === 'demo') name = 'Convidado';
+
+            userName.textContent = name;
+            profileName.textContent = name;
+
+            // Transição
+            loginScreen.style.opacity = '0';
+            loginScreen.style.transform = 'scale(0.96)';
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                appScreen.style.display = 'flex';
+                appScreen.style.animation = 'fadeUp 0.5s ease';
+            }, 300);
+
+            // Salvar no localStorage (simulação)
+            localStorage.setItem('user', JSON.stringify({ name, method }));
+        }
+
+        // ===== NAVEGAÇÃO INFERIOR =====
+        const navItems = document.querySelectorAll('.nav-item');
+        const pages = {
+            home: document.getElementById('pageHome'),
+            search: document.getElementById('pageSearch'),
+            tools: document.getElementById('pageTools'),
+            profile: document.getElementById('pageProfile')
+        };
+
+        navItems.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active de todos
+                navItems.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Esconde todas as páginas
+                Object.values(pages).forEach(p => p.classList.remove('active'));
+
+                // Mostra a página correspondente
+                const pageId = this.dataset.page;
+                const pageElement = document.getElementById(pageId);
+                if (pageElement) {
+                    pageElement.classList.add('active');
+                    // Scroll pro topo
+                    document.getElementById('mainContent').scrollTop = 0;
+                }
+            });
+        });
+
+        // ===== VERIFICA SE JÁ ESTÁ LOGADO =====
+        (function checkSession() {
+            const saved = localStorage.getItem('user');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    document.getElementById('userName').textContent = data.name;
+                    document.getElementById('profileName').textContent = data.name;
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('appScreen').style.display = 'flex';
+                } catch (e) {}
+            }
+        })();
+
+        // ===== DETECTA CLIQUE FORA (para demo) =====
+        console.log('🚀 Market for You — Tema escuro laranja/roxo');
+        console.log('📱 Menu inferior com Home, Pesquisar, Ferramentas, Perfil');
+    </script>
+
+</body>
+  </html>
